@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -22,6 +23,7 @@ import org.hibernate.annotations.SQLRestriction;
 @RequiredArgsConstructor
 @SQLDelete(sql = "UPDATE cars SET is_deleted = TRUE WHERE id =?")
 @SQLRestriction(value = "is_deleted = FALSE")
+@Accessors(chain = true)
 @Table(name = "cars")
 public class Car {
     @Id

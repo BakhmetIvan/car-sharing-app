@@ -42,7 +42,7 @@ public class CarServiceImpl implements CarService {
                 () -> new EntityNotFoundException(String.format(CAR_NOT_FOUND_EXCEPTION, id))
         );
         carMapper.patchCarFromDto(car, updateInventoryDto);
-        return carMapper.toFullDto(car);
+        return carMapper.toFullDto(carRepository.save(car));
     }
 
     @Override
