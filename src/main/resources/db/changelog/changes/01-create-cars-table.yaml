@@ -40,6 +40,6 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: is_deleted
-                  type: BOOLEAN
+                  type: TINYINT(1)
                   constraints:
                     nullable: false

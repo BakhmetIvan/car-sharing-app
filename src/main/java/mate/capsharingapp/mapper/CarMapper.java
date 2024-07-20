@@ -1,10 +1,10 @@
 package mate.capsharingapp.mapper;
 
 import mate.capsharingapp.config.MapperConfig;
-import mate.capsharingapp.dto.CarFullResponseDto;
-import mate.capsharingapp.dto.CarRequestDto;
-import mate.capsharingapp.dto.CarShortResponseDto;
-import mate.capsharingapp.dto.CarUpdateInventoryDto;
+import mate.capsharingapp.dto.car.CarFullResponseDto;
+import mate.capsharingapp.dto.car.CarRequestDto;
+import mate.capsharingapp.dto.car.CarShortResponseDto;
+import mate.capsharingapp.dto.car.CarUpdateInventoryDto;
 import mate.capsharingapp.model.Car;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

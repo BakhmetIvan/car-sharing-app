@@ -19,6 +19,7 @@
         <maven.checkstyle.plugin.sourceDirectory>src/main</maven.checkstyle.plugin.sourceDirectory>
         <maven.checkstyle.plugin.testSourceDirectory>src/test</maven.checkstyle.plugin.testSourceDirectory>
         <testcontainers.version>1.19.7</testcontainers.version>
+        <jjwt.version>0.12.5</jjwt.version>
     </properties>
     <dependencies>
         <dependency>
@@ -91,6 +92,21 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>mysql</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
         </dependency>
     </dependencies>
 

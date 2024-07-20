@@ -1,0 +1,81 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-users-table
+      author: bakhmetIvan
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_deleted
+                  type: TINYINT(1)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: insert-users-in-users-table
+      author: bakhmetIvan
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: manager@gmail.com
+              - column:
+                  name: password
+                  value: $2a$10$hKQ5PJFaKVAr/roV./XUJ.ycTaQ3t3atXJZtCQe4P1hFtdjpRXTwe  # managerpass
+              - column:
+                  name: first_name
+                  value: Manager
+              - column:
+                  name: last_name
+                  value: Manager
+              - column:
+                  name: is_deleted
+                  value: 0
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: ivan@gmail.com
+              - column:
+                  name: password
+                  value: $2a$10$5g7OzkvMRKrbMwZnX.RAT.HM1ZfWD.WJGgvX8QeG4/A5z6vmliBem # ivanpass
+              - column:
+                  name: first_name
+                  value: Ivan
+              - column:
+                  name: last_name
+                  value: Bakhmet
+              - column:
+                  name: is_deleted
+                  value: 0

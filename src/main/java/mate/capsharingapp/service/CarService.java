@@ -1,9 +1,9 @@
 package mate.capsharingapp.service;
 
-import mate.capsharingapp.dto.CarFullResponseDto;
-import mate.capsharingapp.dto.CarRequestDto;
-import mate.capsharingapp.dto.CarShortResponseDto;
-import mate.capsharingapp.dto.CarUpdateInventoryDto;
+import mate.capsharingapp.dto.car.CarFullResponseDto;
+import mate.capsharingapp.dto.car.CarRequestDto;
+import mate.capsharingapp.dto.car.CarShortResponseDto;
+import mate.capsharingapp.dto.car.CarUpdateInventoryDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
