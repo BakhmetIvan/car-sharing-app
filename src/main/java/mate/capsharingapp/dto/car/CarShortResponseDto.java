@@ -1,4 +1,4 @@
-package mate.capsharingapp.dto;
+package mate.capsharingapp.dto.car;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

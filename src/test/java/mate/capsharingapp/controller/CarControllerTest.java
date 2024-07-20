@@ -13,10 +13,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import mate.capsharingapp.dto.CarFullResponseDto;
-import mate.capsharingapp.dto.CarRequestDto;
-import mate.capsharingapp.dto.CarShortResponseDto;
-import mate.capsharingapp.dto.CarUpdateInventoryDto;
+import mate.capsharingapp.dto.car.CarFullResponseDto;
+import mate.capsharingapp.dto.car.CarRequestDto;
+import mate.capsharingapp.dto.car.CarShortResponseDto;
+import mate.capsharingapp.dto.car.CarUpdateInventoryDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -127,8 +127,8 @@ public class CarControllerTest {
         CarShortResponseDto[] actualCars =
                 objectMapper.treeToValue(contentNode, CarShortResponseDto[].class);
 
-        for (int i = 0; i < actualCars.length; i++) {
-            System.out.println(actualCars[i]);
+        for (CarShortResponseDto actualCar : actualCars) {
+            System.out.println(actualCar);
         }
         Assertions.assertEquals(cars.size(), actualCars.length);
     }

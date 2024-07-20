@@ -1,13 +1,14 @@
 package mate.capsharingapp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import mate.capsharingapp.dto.CarFullResponseDto;
-import mate.capsharingapp.dto.CarRequestDto;
-import mate.capsharingapp.dto.CarShortResponseDto;
-import mate.capsharingapp.dto.CarUpdateInventoryDto;
+import mate.capsharingapp.dto.car.CarFullResponseDto;
+import mate.capsharingapp.dto.car.CarRequestDto;
+import mate.capsharingapp.dto.car.CarShortResponseDto;
+import mate.capsharingapp.dto.car.CarUpdateInventoryDto;
 import mate.capsharingapp.service.CarService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/cars")
+@Tag(name = "Car controller", description = "Endpoints for operations with cars")
 public class CarController {
     private final CarService carService;
 

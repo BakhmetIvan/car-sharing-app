@@ -1,4 +1,4 @@
-package mate.capsharingapp.dto;
+package mate.capsharingapp.dto.car;
 
 import java.math.BigDecimal;
 import lombok.Data;

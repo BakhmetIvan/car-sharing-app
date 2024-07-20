@@ -1,10 +1,10 @@
 package mate.capsharingapp.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import mate.capsharingapp.dto.CarFullResponseDto;
-import mate.capsharingapp.dto.CarRequestDto;
-import mate.capsharingapp.dto.CarShortResponseDto;
-import mate.capsharingapp.dto.CarUpdateInventoryDto;
+import mate.capsharingapp.dto.car.CarFullResponseDto;
+import mate.capsharingapp.dto.car.CarRequestDto;
+import mate.capsharingapp.dto.car.CarShortResponseDto;
+import mate.capsharingapp.dto.car.CarUpdateInventoryDto;
 import mate.capsharingapp.exception.EntityNotFoundException;
 import mate.capsharingapp.mapper.CarMapper;
 import mate.capsharingapp.model.Car;

@@ -1,4 +1,4 @@
-package mate.capsharingapp.dto;
+package mate.capsharingapp.dto.car;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

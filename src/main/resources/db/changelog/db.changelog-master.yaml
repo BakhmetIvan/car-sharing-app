@@ -3,3 +3,9 @@ databaseChangeLog:
       file: db/changelog/changes/01-create-cars-table.yaml
   - include:
       file: db/changelog/changes/02-insert-cars-in-cars-table.yaml
+  - include:
+      file: db/changelog/changes/03-create-users-table.yaml
+  - include:
+      file: db/changelog/changes/04-create-roles-table.yaml
+  - include:
+      file: db/changelog/changes/05-create-users-roles-table.yaml
