@@ -21,7 +21,7 @@ public class IsActiveSpecificationProvider implements SpecificationProvider<Rent
         return (root, query, criteriaBuilder) -> {
             if (param.equals("true")) {
                 return criteriaBuilder.isNull(root.get("actualReturnDate"));
-            } else if (param.equals("false")){
+            } else if (param.equals("false")) {
                 return criteriaBuilder.isNotNull(root.get("actualReturnDate"));
             } else {
                 throw new IllegalArgumentException(

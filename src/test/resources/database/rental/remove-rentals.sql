@@ -1,0 +1,2 @@
+DELETE FROM rentals;
+ALTER TABLE rentals AUTO_INCREMENT = 1;
