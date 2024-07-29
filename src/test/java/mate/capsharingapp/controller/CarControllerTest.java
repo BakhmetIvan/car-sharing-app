@@ -126,10 +126,6 @@ public class CarControllerTest {
         JsonNode contentNode = jsonNode.get("content");
         CarShortResponseDto[] actualCars =
                 objectMapper.treeToValue(contentNode, CarShortResponseDto[].class);
-
-        for (CarShortResponseDto actualCar : actualCars) {
-            System.out.println(actualCar);
-        }
         Assertions.assertEquals(cars.size(), actualCars.length);
     }
 

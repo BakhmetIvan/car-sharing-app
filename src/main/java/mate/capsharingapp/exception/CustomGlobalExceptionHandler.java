@@ -50,11 +50,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put(ERROR_OCCURRENCE_TIME, LocalDateTime.now());
-        body.put(ERROR_STATUS, HttpStatus.NOT_FOUND.value());
-        body.put(ERROR_MESSAGE, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+        return getNotFoundException(ex.getMessage());
     }
 
     @ExceptionHandler(ProfileException.class)
@@ -63,6 +59,19 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         body.put(ERROR_OCCURRENCE_TIME, LocalDateTime.now());
         body.put(ERROR_STATUS, HttpStatus.BAD_REQUEST.value());
         body.put(ERROR_MESSAGE, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(RentalException.class)
+    public ResponseEntity<Object> handleRentalException(RentalException ex) {
+        return getNotFoundException(ex.getMessage());
+    }
+
+    private ResponseEntity<Object> getNotFoundException(String message) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(ERROR_OCCURRENCE_TIME, LocalDateTime.now());
+        body.put(ERROR_STATUS, HttpStatus.NOT_FOUND.value());
+        body.put(ERROR_MESSAGE, message);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 }
