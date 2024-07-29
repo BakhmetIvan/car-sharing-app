@@ -2,8 +2,8 @@ package mate.capsharingapp.repository;
 
 import org.springframework.data.jpa.domain.Specification;
 
-public interface SpecificationProvider<T, Y> {
+public interface SpecificationProvider<T> {
     String getKey();
 
-    Specification<T> getSpecification(Y param);
+    Specification<T> getSpecification(String param);
 }

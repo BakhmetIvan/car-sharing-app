@@ -11,20 +11,22 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RentalSpecificationBuilder implements SpecificationBuilder<Rental> {
-    private final SpecificationProviderManager<Rental, Object> rentalSpecificationProviderManager;
+    private static final String USER_SPECIFICATION = "user";
+    private static final String IS_ACTIVE_SPECIFICATION = "actualReturnDate";
+    private final SpecificationProviderManager<Rental> rentalSpecificationProviderManager;
 
     @Override
     public Specification<Rental> build(RentalSearchByIsActiveDto searchByIsActiveDto) {
         Specification<Rental> specification = Specification.where(null);
         if (searchByIsActiveDto.getUserId() != null) {
             specification = specification.and(rentalSpecificationProviderManager
-                    .getSpecificationProvider("userId")
+                    .getSpecificationProvider(USER_SPECIFICATION)
                     .getSpecification(searchByIsActiveDto.getUserId()));
         }
-        if (searchByIsActiveDto.isActive()) {
+        if (searchByIsActiveDto.getIsActive() != null) {
             specification = specification.and(rentalSpecificationProviderManager
-                    .getSpecificationProvider("isActive")
-                    .getSpecification(searchByIsActiveDto.isActive()));
+                    .getSpecificationProvider(IS_ACTIVE_SPECIFICATION)
+                    .getSpecification(searchByIsActiveDto.getIsActive()));
         }
         return specification;
     }

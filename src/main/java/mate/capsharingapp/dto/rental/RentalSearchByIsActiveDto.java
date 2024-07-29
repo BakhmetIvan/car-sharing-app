@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class RentalSearchByIsActiveDto {
-    private Long userId;
+    private String userId;
     @NotNull(message = "IsActive can't be null")
-    private boolean isActive;
+    private String isActive;
 }

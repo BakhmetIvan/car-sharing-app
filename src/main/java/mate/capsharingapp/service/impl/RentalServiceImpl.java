@@ -35,7 +35,7 @@ public class RentalServiceImpl implements RentalService {
 
     @Transactional
     @Override
-    public RentalResponseDto save(User user, RentalRequestDto requestDto) {
+    public RentalFullResponseDto save(User user, RentalRequestDto requestDto) {
         Rental rental = rentalMapper.toModel(requestDto);
         rental.setUser(user);
         Car car = carRepository.findById(requestDto.getCarId()).orElseThrow(
@@ -47,7 +47,7 @@ public class RentalServiceImpl implements RentalService {
         }
         car.setInventory(car.getInventory() - 1);
         rental.setCar(car);
-        return rentalMapper.toDto(rentalRepository.save(rental));
+        return rentalMapper.toFullDto(rentalRepository.save(rental));
     }
 
     @Transactional

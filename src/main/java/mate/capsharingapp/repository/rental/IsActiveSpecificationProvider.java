@@ -6,7 +6,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IsActiveSpecificationProvider implements SpecificationProvider<Rental, Boolean> {
+public class IsActiveSpecificationProvider implements SpecificationProvider<Rental> {
+    private static final String INCORRECT_PARAM_VALUE_EXCEPTION =
+            "Param should contains true or false, but contains: %s";
     private static final String IS_ACTIVE_FIELD_NAME = "actualReturnDate";
 
     @Override
@@ -15,12 +17,16 @@ public class IsActiveSpecificationProvider implements SpecificationProvider<Rent
     }
 
     @Override
-    public Specification<Rental> getSpecification(Boolean param) {
+    public Specification<Rental> getSpecification(String param) {
         return (root, query, criteriaBuilder) -> {
-            if (param) {
+            if (param.equals("true")) {
                 return criteriaBuilder.isNull(root.get("actualReturnDate"));
-            } else {
+            } else if (param.equals("false")){
                 return criteriaBuilder.isNotNull(root.get("actualReturnDate"));
+            } else {
+                throw new IllegalArgumentException(
+                        String.format(INCORRECT_PARAM_VALUE_EXCEPTION, param)
+                );
             }
         };
     }

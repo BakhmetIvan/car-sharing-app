@@ -41,7 +41,7 @@ public class RentalController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new rental",
             description = "Allows a user to create a new rental")
-    public RentalResponseDto createRental(Authentication authentication,
+    public RentalFullResponseDto createRental(Authentication authentication,
                                           @RequestBody @Valid RentalRequestDto requestDto) {
         User user = (User) authentication.getPrincipal();
         return rentalService.save(user, requestDto);
@@ -54,14 +54,14 @@ public class RentalController {
                     + "and allows manager to find all rentals for specific user or for all users")
     public Page<RentalResponseDto> findAllByActiveStatus(
             Authentication authentication,
-            @RequestBody @Valid RentalSearchByIsActiveDto searchByIsActiveDto,
+            @Valid RentalSearchByIsActiveDto searchByIsActiveDto,
             @PageableDefault Pageable pageable
     ) {
         User user = (User) authentication.getPrincipal();
         if (user.getAuthorities().stream()
                 .noneMatch(role ->
                         role.getAuthority().equals(Role.RoleName.ROLE_MANAGER.name()))) {
-            searchByIsActiveDto.setUserId(user.getId());
+            searchByIsActiveDto.setUserId(user.getId().toString());
         }
         return rentalService.findAllByActiveStatus(searchByIsActiveDto, pageable);
     }

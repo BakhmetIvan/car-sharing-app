@@ -7,12 +7,15 @@ import mate.capsharingapp.dto.rental.RentalResponseDto;
 import mate.capsharingapp.dto.rental.RentalSetActualReturnDateDto;
 import mate.capsharingapp.model.Rental;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(config = MapperConfig.class, uses = {CarMapper.class, UserMapper.class})
 public interface RentalMapper {
     Rental toModel(RentalRequestDto requestDto);
 
+    @Mapping(target = "carId", source = "car.id")
+    @Mapping(target = "userId", source = "user.id")
     RentalResponseDto toDto(Rental rental);
 
     RentalFullResponseDto toFullDto(Rental rental);

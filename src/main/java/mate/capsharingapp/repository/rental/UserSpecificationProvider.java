@@ -6,7 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserSpecificationProvider implements SpecificationProvider<Rental, Long> {
+public class UserSpecificationProvider implements SpecificationProvider<Rental> {
     private static final String USER_FIELD_NAME = "user";
 
     @Override
@@ -15,7 +15,7 @@ public class UserSpecificationProvider implements SpecificationProvider<Rental, 
     }
 
     @Override
-    public Specification<Rental> getSpecification(Long param) {
+    public Specification<Rental> getSpecification(String param) {
         return (root, query, criteriaBuilder)
                 -> criteriaBuilder.equal(root.get(USER_FIELD_NAME).get("id"), param);
     }

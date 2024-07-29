@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface RentalService {
-    RentalResponseDto save(User user, RentalRequestDto requestDto);
+    RentalFullResponseDto save(User user, RentalRequestDto requestDto);
 
     Page<RentalResponseDto> findAllByActiveStatus(RentalSearchByIsActiveDto searchByIsActiveDto,
                                                   Pageable pageable);

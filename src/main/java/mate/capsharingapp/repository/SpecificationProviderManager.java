@@ -1,5 +1,5 @@
 package mate.capsharingapp.repository;
 
-public interface SpecificationProviderManager<T, Y> {
-    SpecificationProvider<T, Y> getSpecificationProvider(String key);
+public interface SpecificationProviderManager<T> {
+    SpecificationProvider<T> getSpecificationProvider(String key);
 }

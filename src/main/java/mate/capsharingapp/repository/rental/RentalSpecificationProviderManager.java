@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RentalSpecificationProviderManager
-        implements SpecificationProviderManager<Rental, Object> {
+        implements SpecificationProviderManager<Rental> {
     private static final String SPECIFICATION_NOT_FOUND_EXCEPTION =
             "Can't find specification for key %s";
-    private final List<SpecificationProvider<Rental, Object>> rentalSpecificationProviderList;
+    private final List<SpecificationProvider<Rental>> rentalSpecificationProviderList;
 
     @Override
-    public SpecificationProvider<Rental, Object> getSpecificationProvider(String key) {
+    public SpecificationProvider<Rental> getSpecificationProvider(String key) {
         return rentalSpecificationProviderList.stream()
                 .filter(specProvider -> specProvider.getKey().equals(key))
                 .findFirst()
