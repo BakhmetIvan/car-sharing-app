@@ -28,6 +28,8 @@ public class RentalServiceImpl implements RentalService {
     private static final String CAR_NOT_FOUND_EXCEPTION = "Can't find car by id: %d";
     private static final String RENTAL_NOT_FOUND_EXCEPTION = "Can't find rental by id: %d";
     private static final String NO_CARS_AVAILABLE_EXCEPTION = "No cars available anymore";
+    private static final String RENTAL_ALREADY_RETURNED_EXCEPTION =
+            "Rental with id - %d already returned";
     private final SpecificationBuilder<Rental> rentalSpecificationBuilder;
     private final RentalRepository rentalRepository;
     private final CarRepository carRepository;
@@ -81,6 +83,11 @@ public class RentalServiceImpl implements RentalService {
                         String.format(RENTAL_NOT_FOUND_EXCEPTION, id)
                 )
         );
+        if (rental.getActualReturnDate() != null) {
+            throw new RentalException(
+                    String.format(RENTAL_ALREADY_RETURNED_EXCEPTION, rental.getId())
+            );
+        }
         Long carId = rental.getCar().getId();
         Car car = carRepository.findById(carId).orElseThrow(
                 () -> new EntityNotFoundException(
