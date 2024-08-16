@@ -50,6 +50,7 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+    private Long tgChatId;
     @ToString.Exclude
     @Column(nullable = false)
     private boolean isDeleted = false;

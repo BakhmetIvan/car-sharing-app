@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changes/05-create-users-roles-table.yaml
   - include:
       file: db/changelog/changes/06-create-rental-table.yaml
+  - include:
+      file: db/changelog/changes/07-add-chat-id-to-users-table.yaml
