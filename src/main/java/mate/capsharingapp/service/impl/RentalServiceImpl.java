@@ -25,9 +25,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
+    private static final String RENTAL_CREATE_NOTIFICATION =
+            "🎉 Congratulations, your rental is confirmed! 🚗\n"
+                    + "Car: %s %s (%s)\n"
+                    + "Rental start date: %s\n"
+                    + "Rental end date: %s\n"
+                    + "\n"
+                    + "Thank you for choosing our service! We wish you a pleasant journey. 😊";
     private static final String CAR_NOT_FOUND_EXCEPTION = "Can't find car by id: %d";
     private static final String RENTAL_NOT_FOUND_EXCEPTION = "Can't find rental by id: %d";
     private static final String NO_CARS_AVAILABLE_EXCEPTION = "No cars available anymore";
+    private static final String RENTAL_ALREADY_RETURNED_EXCEPTION =
+            "Rental with id - %d already returned";
+    private final TelegramNotificationServiceImpl telegramNotificationService;
     private final SpecificationBuilder<Rental> rentalSpecificationBuilder;
     private final RentalRepository rentalRepository;
     private final CarRepository carRepository;
@@ -47,6 +57,17 @@ public class RentalServiceImpl implements RentalService {
         }
         car.setInventory(car.getInventory() - 1);
         rental.setCar(car);
+        if (!(user.getTgChatId() == null)) {
+            String message = String.format(
+                    RENTAL_CREATE_NOTIFICATION,
+                    car.getBrand(),
+                    car.getModel(),
+                    car.getCarType(),
+                    requestDto.getRentalDate(),
+                    requestDto.getReturnDate()
+            );
+            telegramNotificationService.sendNotification(user.getTgChatId(), message);
+        }
         return rentalMapper.toFullDto(rentalRepository.save(rental));
     }
 
@@ -81,6 +102,11 @@ public class RentalServiceImpl implements RentalService {
                         String.format(RENTAL_NOT_FOUND_EXCEPTION, id)
                 )
         );
+        if (rental.getActualReturnDate() != null) {
+            throw new RentalException(
+                    String.format(RENTAL_ALREADY_RETURNED_EXCEPTION, rental.getId())
+            );
+        }
         Long carId = rental.getCar().getId();
         Car car = carRepository.findById(carId).orElseThrow(
                 () -> new EntityNotFoundException(
