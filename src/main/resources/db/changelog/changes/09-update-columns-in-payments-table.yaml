@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: alter-payments-table-session-url-and-id
+      author: bakhmetIvan
+      changes:
+        - modifyDataType:
+            tableName: payments
+            columnName: session_url
+            newDataType: TEXT
+        - modifyDataType:
+            tableName: payments
+            columnName: session_id
+            newDataType: TEXT
