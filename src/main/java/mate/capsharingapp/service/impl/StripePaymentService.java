@@ -16,6 +16,7 @@ import mate.capsharingapp.exception.PaymentException;
 import mate.capsharingapp.mapper.PaymentMapper;
 import mate.capsharingapp.model.Payment;
 import mate.capsharingapp.model.Rental;
+import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.PaymentRepository;
 import mate.capsharingapp.repository.rental.RentalRepository;
 import mate.capsharingapp.service.PaymentCalculateStrategy;
@@ -38,6 +39,8 @@ public class StripePaymentService implements PaymentService {
             "Stripe error with session: %s";
     private static final String PAYMENT_CANCELED_MESSAGE =
             "Payment session canceled. You can complete the payment within 24 hours";
+    private static final String RENTAL_ACCESS_EXCEPTION =
+            "You don't have permission for this rental";
     private static final String SUCCESS_COMPLETE_MESSAGE = "Payment successful. Thank you!";
     private static final String SUCCESS_NOT_COMPLETE_MESSAGE = "Payment not completed";
     private static final String COMPLETE_SESSION_STATUS = "complete";
@@ -51,11 +54,14 @@ public class StripePaymentService implements PaymentService {
 
     @Transactional
     @Override
-    public PaymentResponseDto createPaymentSession(PaymentRequestDto paymentRequestDto) {
+    public PaymentResponseDto createPaymentSession(PaymentRequestDto paymentRequestDto, User user) {
         Rental rental = rentalRepository.findById(paymentRequestDto.getRentalId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format(RENTAL_NOT_FOUND_EXCEPTION, paymentRequestDto.getRentalId()))
                 );
+        if (!rental.getUser().equals(user)) {
+            throw new PaymentException(RENTAL_ACCESS_EXCEPTION);
+        }
         PaymentCalculateStrategy calculateStrategy = new PaymentCalculateStrategy();
         Payment.PaymentType requestPaymentType =
                 Payment.PaymentType.valueOf(paymentRequestDto.getPaymentType().toUpperCase());
@@ -116,7 +122,7 @@ public class StripePaymentService implements PaymentService {
             SessionCreateParams params = buildSessionCreateParams(amountToPay);
             return Optional.of(Session.create(params));
         } catch (Exception ex) {
-            return Optional.empty();
+            throw new PaymentException(PAYMENT_CREATING_EXCEPTION);
         }
     }
 

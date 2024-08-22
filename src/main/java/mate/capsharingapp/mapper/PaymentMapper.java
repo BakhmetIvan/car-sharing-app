@@ -6,6 +6,7 @@ import mate.capsharingapp.dto.payment.PaymentResponseDto;
 import mate.capsharingapp.dto.payment.PaymentStatusResponseDto;
 import mate.capsharingapp.model.Payment;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(config = MapperConfig.class)
 public interface PaymentMapper {
@@ -13,5 +14,6 @@ public interface PaymentMapper {
 
     PaymentStatusResponseDto toStatusDto(Payment payment);
 
+    @Mapping(target = "rentalId", source = "rental.id")
     PaymentFullResponseDto toFullDto(Payment payment);
 }

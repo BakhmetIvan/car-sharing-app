@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +43,8 @@ public class PaymentController {
             description = "Allows a user's to create a new payment")
     public PaymentResponseDto createPayment(Authentication authentication,
                                             @RequestBody @Valid PaymentRequestDto requestDto) {
-        return paymentService.createPaymentSession(requestDto);
+        User user = (User) authentication.getPrincipal();
+        return paymentService.createPaymentSession(requestDto, user);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER')")
@@ -52,11 +52,11 @@ public class PaymentController {
     @Operation(summary = "Find all payments",
             description = "Returns a page of payments by user id")
     public Page<PaymentFullResponseDto> findAll(Authentication authentication,
-                                                @RequestParam @Positive Long userId,
+                                                @Positive Long userId,
                                                 @PageableDefault Pageable pageable) {
         User user = (User) authentication.getPrincipal();
         if (user.getAuthorities().stream()
-                .noneMatch(role ->
+                .anyMatch(role ->
                         role.getAuthority().equals(Role.RoleName.ROLE_MANAGER.name()))) {
             return paymentService.findAllByUserId(userId, pageable);
         }
