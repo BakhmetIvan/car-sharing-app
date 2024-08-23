@@ -18,17 +18,19 @@ import mate.capsharingapp.dto.car.CarFullResponseDto;
 import mate.capsharingapp.dto.rental.RentalFullResponseDto;
 import mate.capsharingapp.dto.rental.RentalRequestDto;
 import mate.capsharingapp.dto.rental.RentalResponseDto;
-import mate.capsharingapp.dto.rental.RentalSearchByIsActiveDto;
 import mate.capsharingapp.dto.rental.RentalSetActualReturnDateDto;
+import mate.capsharingapp.dto.rental.SearchRentalByIsActive;
 import mate.capsharingapp.dto.user.UserResponseDto;
 import mate.capsharingapp.exception.EntityNotFoundException;
 import mate.capsharingapp.exception.RentalException;
 import mate.capsharingapp.mapper.RentalMapper;
 import mate.capsharingapp.model.Car;
+import mate.capsharingapp.model.Payment;
 import mate.capsharingapp.model.Rental;
 import mate.capsharingapp.model.Role;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.CarRepository;
+import mate.capsharingapp.repository.PaymentRepository;
 import mate.capsharingapp.repository.rental.RentalRepository;
 import mate.capsharingapp.repository.rental.RentalSpecificationBuilder;
 import mate.capsharingapp.service.impl.RentalServiceImpl;
@@ -116,6 +118,8 @@ public class RentalServiceTest {
             new RentalSetActualReturnDateDto()
             .setActualReturnDate(LocalDate.of(2024, 8, 1));
     @Mock
+    private PaymentRepository paymentRepository;
+    @Mock
     private RentalRepository rentalRepository;
     @Mock
     private RentalMapper rentalMapper;
@@ -134,6 +138,8 @@ public class RentalServiceTest {
         when(carRepository.findById(ACTIVE_RENTAL_REQUEST_DTO
                 .getCarId())).thenReturn(Optional.of(CAR));
         when(rentalRepository.save(ACTIVE_RENTAL)).thenReturn(ACTIVE_RENTAL);
+        when(paymentRepository.existsByRentalUserAndStatus(USER, Payment.PaymentStatus.PENDING))
+                .thenReturn(false);
 
         RentalFullResponseDto actual = rentalService.save(USER, ACTIVE_RENTAL_REQUEST_DTO);
 
@@ -153,6 +159,8 @@ public class RentalServiceTest {
         when(rentalMapper.toModel(ACTIVE_RENTAL_REQUEST_DTO)).thenReturn(ACTIVE_RENTAL);
         when(carRepository.findById(ACTIVE_RENTAL_REQUEST_DTO.getCarId()))
                 .thenReturn(Optional.of(car));
+        when(paymentRepository.existsByRentalUserAndStatus(USER, Payment.PaymentStatus.PENDING))
+                .thenReturn(false);
 
         RentalException exception = Assertions.assertThrows(RentalException.class,
                 () -> rentalService.save(USER, ACTIVE_RENTAL_REQUEST_DTO));
@@ -204,10 +212,10 @@ public class RentalServiceTest {
         rentalResponseDtoList.add(ACTIVE_RENTAL_SHORT_RESPONSE_DTO);
         rentalResponseDtoList.add(ACTIVE_SECOND_RENTAL_SHORT_RESPONSE_DTO);
         Page<Rental> rentalPage = new PageImpl<>(rentalList);
-        RentalSearchByIsActiveDto searchParameters =
-                new RentalSearchByIsActiveDto().setIsActive("true");
+        SearchRentalByIsActive searchByIsActive =
+                new SearchRentalByIsActive().setIsActive("true");
 
-        when(rentalSpecificationBuilder.build(searchParameters))
+        when(rentalSpecificationBuilder.build(searchByIsActive))
                 .thenReturn(Specification.where(null));
         when(rentalRepository.findAll(Specification.where(null),
                 Pageable.unpaged())).thenReturn(rentalPage);
@@ -215,7 +223,7 @@ public class RentalServiceTest {
         when(rentalMapper.toDto(rentalList.get(1))).thenReturn(rentalResponseDtoList.get(1));
 
         Page<RentalResponseDto> actual =
-                rentalService.findAllByActiveStatus(searchParameters, Pageable.unpaged());
+                rentalService.findAllByActiveStatus(searchByIsActive, Pageable.unpaged());
 
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(rentalResponseDtoList, actual.getContent());

@@ -1,0 +1,2 @@
+DELETE FROM payments;
+ALTER TABLE payments AUTO_INCREMENT = 1;

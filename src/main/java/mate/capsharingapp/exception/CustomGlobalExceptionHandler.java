@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -50,28 +51,34 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
-        return getNotFoundException(ex.getMessage());
+        return buildError(ex, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ProfileException.class)
     public ResponseEntity<Object> handleProfileException(ProfileException ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put(ERROR_OCCURRENCE_TIME, LocalDateTime.now());
-        body.put(ERROR_STATUS, HttpStatus.BAD_REQUEST.value());
-        body.put(ERROR_MESSAGE, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+        return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(RentalException.class)
     public ResponseEntity<Object> handleRentalException(RentalException ex) {
-        return getNotFoundException(ex.getMessage());
+        return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private ResponseEntity<Object> getNotFoundException(String message) {
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<Object> handlePaymentException(PaymentException ex) {
+        return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
+        return buildError(ex, HttpStatus.FORBIDDEN);
+    }
+
+    private ResponseEntity<Object> buildError(Exception ex, HttpStatus status) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(ERROR_OCCURRENCE_TIME, LocalDateTime.now());
-        body.put(ERROR_STATUS, HttpStatus.NOT_FOUND.value());
-        body.put(ERROR_MESSAGE, message);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+        body.put(ERROR_STATUS, status);
+        body.put(ERROR_MESSAGE, ex.getMessage());
+        return ResponseEntity.status(status).body(body);
     }
 }
