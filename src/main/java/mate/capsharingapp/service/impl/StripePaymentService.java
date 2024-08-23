@@ -5,6 +5,7 @@ import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import mate.capsharingapp.dto.payment.PaymentFullResponseDto;
@@ -55,6 +56,10 @@ public class StripePaymentService implements PaymentService {
     @Transactional
     @Override
     public PaymentResponseDto createPaymentSession(PaymentRequestDto paymentRequestDto, User user) {
+        if (paymentRepository.findByRentalIdAndStatusIn(paymentRequestDto.getRentalId(),
+                List.of(Payment.PaymentStatus.PAID, Payment.PaymentStatus.PENDING)).isPresent()) {
+            throw new PaymentException(PAYMENT_CREATING_EXCEPTION);
+        }
         Rental rental = rentalRepository.findById(paymentRequestDto.getRentalId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format(RENTAL_NOT_FOUND_EXCEPTION, paymentRequestDto.getRentalId()))
