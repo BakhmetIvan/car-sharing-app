@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import mate.capsharingapp.dto.rental.RentalFullResponseDto;
 import mate.capsharingapp.dto.rental.RentalRequestDto;
 import mate.capsharingapp.dto.rental.RentalResponseDto;
-import mate.capsharingapp.dto.rental.RentalSearchByIsActiveDto;
 import mate.capsharingapp.dto.rental.RentalSetActualReturnDateDto;
+import mate.capsharingapp.dto.rental.SearchRentalByIsActive;
 import mate.capsharingapp.exception.EntityNotFoundException;
 import mate.capsharingapp.exception.RentalException;
 import mate.capsharingapp.mapper.RentalMapper;
@@ -81,10 +81,10 @@ public class RentalServiceImpl implements RentalService {
     @Transactional
     @Override
     public Page<RentalResponseDto> findAllByActiveStatus(
-            RentalSearchByIsActiveDto searchByIsActiveDto,
+            SearchRentalByIsActive searchByIsActive,
             Pageable pageable
     ) {
-        Specification<Rental> specification = rentalSpecificationBuilder.build(searchByIsActiveDto);
+        Specification<Rental> specification = rentalSpecificationBuilder.build(searchByIsActive);
         return rentalRepository.findAll(specification, pageable)
                 .map(rentalMapper::toDto);
     }

@@ -3,13 +3,14 @@ package mate.capsharingapp.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import mate.capsharingapp.dto.rental.RentalFullResponseDto;
 import mate.capsharingapp.dto.rental.RentalRequestDto;
 import mate.capsharingapp.dto.rental.RentalResponseDto;
-import mate.capsharingapp.dto.rental.RentalSearchByIsActiveDto;
 import mate.capsharingapp.dto.rental.RentalSetActualReturnDateDto;
+import mate.capsharingapp.dto.rental.SearchRentalByIsActive;
 import mate.capsharingapp.model.Role;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.service.RentalService;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rentals")
 @Tag(name = "Rental controller", description = "Endpoints for operations with rentals")
 public class RentalController {
+    private static final String ACCESS_DENIED_EXCEPTION =
+            "You are not allowed to view rentals of another user";
     private final RentalService rentalService;
 
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -54,16 +58,23 @@ public class RentalController {
                     + "and allows manager to find all rentals for specific user or for all users")
     public Page<RentalResponseDto> findAllByActiveStatus(
             Authentication authentication,
-            @Valid RentalSearchByIsActiveDto searchByIsActiveDto,
+            String userId, @NotBlank String isActive,
             @PageableDefault Pageable pageable
     ) {
         User user = (User) authentication.getPrincipal();
-        if (user.getAuthorities().stream()
-                .noneMatch(role ->
-                        role.getAuthority().equals(Role.RoleName.ROLE_MANAGER.name()))) {
-            searchByIsActiveDto.setUserId(user.getId().toString());
+        SearchRentalByIsActive searchByIsActive = new SearchRentalByIsActive()
+                .setIsActive(isActive);
+        boolean isManager = user.getAuthorities().stream()
+                .anyMatch(role -> role.getAuthority().equals(Role.RoleName.ROLE_MANAGER.name()));
+        if (!isManager && userId != null) {
+            throw new AccessDeniedException(ACCESS_DENIED_EXCEPTION);
         }
-        return rentalService.findAllByActiveStatus(searchByIsActiveDto, pageable);
+        if (!isManager) {
+            searchByIsActive.setUserId(user.getId().toString());
+        } else {
+            searchByIsActive.setUserId(userId != null ? userId : user.getId().toString());
+        }
+        return rentalService.findAllByActiveStatus(searchByIsActive, pageable);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")

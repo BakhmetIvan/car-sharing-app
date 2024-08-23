@@ -18,8 +18,8 @@ import mate.capsharingapp.dto.car.CarFullResponseDto;
 import mate.capsharingapp.dto.rental.RentalFullResponseDto;
 import mate.capsharingapp.dto.rental.RentalRequestDto;
 import mate.capsharingapp.dto.rental.RentalResponseDto;
-import mate.capsharingapp.dto.rental.RentalSearchByIsActiveDto;
 import mate.capsharingapp.dto.rental.RentalSetActualReturnDateDto;
+import mate.capsharingapp.dto.rental.SearchRentalByIsActive;
 import mate.capsharingapp.dto.user.UserResponseDto;
 import mate.capsharingapp.exception.EntityNotFoundException;
 import mate.capsharingapp.exception.RentalException;
@@ -212,10 +212,10 @@ public class RentalServiceTest {
         rentalResponseDtoList.add(ACTIVE_RENTAL_SHORT_RESPONSE_DTO);
         rentalResponseDtoList.add(ACTIVE_SECOND_RENTAL_SHORT_RESPONSE_DTO);
         Page<Rental> rentalPage = new PageImpl<>(rentalList);
-        RentalSearchByIsActiveDto searchParameters =
-                new RentalSearchByIsActiveDto().setIsActive("true");
+        SearchRentalByIsActive searchByIsActive =
+                new SearchRentalByIsActive().setIsActive("true");
 
-        when(rentalSpecificationBuilder.build(searchParameters))
+        when(rentalSpecificationBuilder.build(searchByIsActive))
                 .thenReturn(Specification.where(null));
         when(rentalRepository.findAll(Specification.where(null),
                 Pageable.unpaged())).thenReturn(rentalPage);
@@ -223,7 +223,7 @@ public class RentalServiceTest {
         when(rentalMapper.toDto(rentalList.get(1))).thenReturn(rentalResponseDtoList.get(1));
 
         Page<RentalResponseDto> actual =
-                rentalService.findAllByActiveStatus(searchParameters, Pageable.unpaged());
+                rentalService.findAllByActiveStatus(searchByIsActive, Pageable.unpaged());
 
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(rentalResponseDtoList, actual.getContent());

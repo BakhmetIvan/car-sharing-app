@@ -1,7 +1,7 @@
 package mate.capsharingapp.repository.rental;
 
 import lombok.RequiredArgsConstructor;
-import mate.capsharingapp.dto.rental.RentalSearchByIsActiveDto;
+import mate.capsharingapp.dto.rental.SearchRentalByIsActive;
 import mate.capsharingapp.model.Rental;
 import mate.capsharingapp.repository.SpecificationBuilder;
 import mate.capsharingapp.repository.SpecificationProviderManager;
@@ -16,17 +16,17 @@ public class RentalSpecificationBuilder implements SpecificationBuilder<Rental> 
     private final SpecificationProviderManager<Rental> rentalSpecificationProviderManager;
 
     @Override
-    public Specification<Rental> build(RentalSearchByIsActiveDto searchByIsActiveDto) {
+    public Specification<Rental> build(SearchRentalByIsActive searchByIsActive) {
         Specification<Rental> specification = Specification.where(null);
-        if (searchByIsActiveDto.getUserId() != null) {
+        if (searchByIsActive.getUserId() != null) {
             specification = specification.and(rentalSpecificationProviderManager
                     .getSpecificationProvider(USER_SPECIFICATION)
-                    .getSpecification(searchByIsActiveDto.getUserId()));
+                    .getSpecification(searchByIsActive.getUserId()));
         }
-        if (searchByIsActiveDto.getIsActive() != null) {
+        if (searchByIsActive.getIsActive() != null) {
             specification = specification.and(rentalSpecificationProviderManager
                     .getSpecificationProvider(IS_ACTIVE_SPECIFICATION)
-                    .getSpecification(searchByIsActiveDto.getIsActive()));
+                    .getSpecification(searchByIsActive.getIsActive()));
         }
         return specification;
     }

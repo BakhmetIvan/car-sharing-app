@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class RentalSearchByIsActiveDto {
+public class SearchRentalByIsActive {
     private String userId;
     @NotNull(message = "IsActive can't be null")
     private String isActive;
