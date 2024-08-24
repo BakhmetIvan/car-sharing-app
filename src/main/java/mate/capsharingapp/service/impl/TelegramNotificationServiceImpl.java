@@ -1,8 +1,12 @@
 package mate.capsharingapp.service.impl;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import mate.capsharingapp.model.Role;
+import mate.capsharingapp.model.User;
+import mate.capsharingapp.repository.UserRepository;
 import mate.capsharingapp.service.NotificationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @RequiredArgsConstructor
 public class TelegramNotificationServiceImpl extends TelegramLongPollingBot
         implements NotificationService {
+    private final UserRepository userRepository;
     @Value("${telegram.bot.username}")
     private String botUsername;
     @Value("${telegram.bot.token}")
@@ -28,7 +33,14 @@ public class TelegramNotificationServiceImpl extends TelegramLongPollingBot
     }
 
     @Override
-    public void sendNotification(Long chatId, String message) {
+    public void sendNotificationToAdmins(String message) {
+        List<User> admins = userRepository.findAllByRolesName(Role.RoleName.ROLE_MANAGER);
+        for (User user : admins) {
+            sendNotification(user.getTgChatId(), message);
+        }
+    }
+
+    private void sendNotification(Long chatId, String message) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(message);

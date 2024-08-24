@@ -27,14 +27,29 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
-    private static final String RENTAL_CREATE_NOTIFICATION =
+    public static final String RENTAL_CREATE_NOTIFICATION =
             """
-                    🎉 Congratulations, your rental is confirmed! 🚗
-                    Car: %s %s (%s)
-                    Rental start date: %s
-                    Rental end date: %s
+                    Successful Car Rental
 
-                    Thank you for choosing our service! We wish you a pleasant journey. 😊""";
+                    Dear Admins,
+
+                    We are pleased to inform you about a successful car rental.\s
+                    Below are the details of the rental and the associated user:
+
+                    Rental Details:
+                    - Rental ID: %s
+                    - Car Model: %s
+                    - Rental Date: %s
+                    - Scheduled Return Date: %s
+
+                    User Details:
+                    - User ID: %s
+                    - User Name: %s %s
+                    - Email: %s
+
+                    Please ensure everything is in order for this rental.
+
+                    Thank you.""";
     private static final String UNPAID_PAYMENT_EXCEPTION =
             "You cannot create a new rental while you have unpaid rentals";
     private static final String CAR_NOT_FOUND_EXCEPTION = "Can't find car by id: %d";
@@ -67,13 +82,16 @@ public class RentalServiceImpl implements RentalService {
         if (!(user.getTgChatId() == null)) {
             String message = String.format(
                     RENTAL_CREATE_NOTIFICATION,
-                    car.getBrand(),
-                    car.getModel(),
-                    car.getCarType(),
-                    requestDto.getRentalDate(),
-                    requestDto.getReturnDate()
+                    rental.getId(),
+                    rental.getCar().getModel(),
+                    rental.getRentalDate(),
+                    rental.getReturnDate(),
+                    user.getId(),
+                    user.getLastName(),
+                    user.getFirstName(),
+                    user.getEmail()
             );
-            telegramNotificationService.sendNotification(user.getTgChatId(), message);
+            telegramNotificationService.sendNotificationToAdmins(message);
         }
         return rentalMapper.toFullDto(rentalRepository.save(rental));
     }

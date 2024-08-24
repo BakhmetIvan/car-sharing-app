@@ -20,6 +20,7 @@ import mate.capsharingapp.model.Rental;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.PaymentRepository;
 import mate.capsharingapp.repository.rental.RentalRepository;
+import mate.capsharingapp.service.NotificationService;
 import mate.capsharingapp.service.PaymentCalculateStrategy;
 import mate.capsharingapp.service.PaymentService;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,30 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class StripePaymentService implements PaymentService {
+    public static final String PAYMENT_SUCCESS_NOTIFICATION =
+            """
+                    Payment Successful
+
+                    Dear Admins,
+
+                    We are pleased to inform you that a payment has been successfully processed.\s
+                    Below are the details of the rental, car, and the associated user:
+
+                    Rental Details:
+                    - Rental ID: %s
+                    - Car Model: %s
+                    - Rental Date: %s
+                    - Scheduled Return Date: %s
+                    - Payment Amount: %s
+
+                    User Details:
+                    - User ID: %s
+                    - User Name: %s %s
+                    - Email: %s
+
+                    Please confirm the payment and update the rental status if necessary.
+
+                    Thank you!""";
     private static final String RENTAL_NOT_FOUND_EXCEPTION =
             "Can't find rental by id = %d";
     private static final String PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION =
@@ -49,6 +74,7 @@ public class StripePaymentService implements PaymentService {
     private static final String SUCCESS_LINK = "https://success";
     private static final String SESSION_NAME = "Car Rental Payment";
     private static final int DAY_IN_SECONDS = 86400;
+    private final NotificationService notificationService;
     private final RentalRepository rentalRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
@@ -64,7 +90,7 @@ public class StripePaymentService implements PaymentService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format(RENTAL_NOT_FOUND_EXCEPTION, paymentRequestDto.getRentalId()))
                 );
-        if (!rental.getUser().equals(user)) {
+        if (!rental.getUser().getId().equals(user.getId())) {
             throw new PaymentException(RENTAL_ACCESS_EXCEPTION);
         }
         PaymentCalculateStrategy calculateStrategy = new PaymentCalculateStrategy();
@@ -104,6 +130,20 @@ public class StripePaymentService implements PaymentService {
             Session session = Session.retrieve(sessionId);
             if (session.getStatus().equals(COMPLETE_SESSION_STATUS)) {
                 payment.setStatus(Payment.PaymentStatus.PAID);
+                Rental rental = payment.getRental();
+                notificationService.sendNotificationToAdmins(
+                        String.format(
+                                PAYMENT_SUCCESS_NOTIFICATION,
+                                rental.getId(),
+                                rental.getCar().getModel(),
+                                rental.getRentalDate(),
+                                rental.getReturnDate(),
+                                payment.getAmountToPay(),
+                                rental.getUser().getId(),
+                                rental.getUser().getLastName(),
+                                rental.getUser().getFirstName(),
+                                rental.getUser().getEmail())
+                );
                 paymentRepository.save(payment);
                 return paymentMapper.toStatusDto(payment).setMessage(SUCCESS_COMPLETE_MESSAGE);
             }
