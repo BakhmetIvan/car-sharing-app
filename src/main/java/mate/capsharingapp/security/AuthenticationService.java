@@ -3,6 +3,7 @@ package mate.capsharingapp.security;
 import lombok.RequiredArgsConstructor;
 import mate.capsharingapp.dto.user.UserLoginRequestDto;
 import mate.capsharingapp.dto.user.UserLoginResponseDto;
+import mate.capsharingapp.messages.ExceptionMessages;
 import mate.capsharingapp.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    private static final String USER_NOT_FOUND_EXCEPTION = "Can't find user by email: %s";
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -26,7 +26,8 @@ public class AuthenticationService {
         );
         UserDetails user = userRepository.findByEmail(authentication.getName()).orElseThrow(
                 () -> new UsernameNotFoundException(
-                        String.format(USER_NOT_FOUND_EXCEPTION, requestDto.getEmail()))
+                        String.format(ExceptionMessages.NOT_FOUND_USER_BY_EMAIL_EXCEPTION,
+                                requestDto.getEmail()))
         );
         String jwt = jwtUtil.generateToken(user);
         return new UserLoginResponseDto(jwt);

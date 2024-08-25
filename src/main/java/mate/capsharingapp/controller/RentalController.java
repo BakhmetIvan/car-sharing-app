@@ -11,6 +11,7 @@ import mate.capsharingapp.dto.rental.RentalRequestDto;
 import mate.capsharingapp.dto.rental.RentalResponseDto;
 import mate.capsharingapp.dto.rental.RentalSetActualReturnDateDto;
 import mate.capsharingapp.dto.rental.SearchRentalByIsActive;
+import mate.capsharingapp.messages.ExceptionMessages;
 import mate.capsharingapp.model.Role;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.service.RentalService;
@@ -36,8 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rentals")
 @Tag(name = "Rental controller", description = "Endpoints for operations with rentals")
 public class RentalController {
-    private static final String ACCESS_DENIED_EXCEPTION =
-            "You are not allowed to view rentals of another user";
     private final RentalService rentalService;
 
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -67,7 +66,7 @@ public class RentalController {
         boolean isManager = user.getAuthorities().stream()
                 .anyMatch(role -> role.getAuthority().equals(Role.RoleName.ROLE_MANAGER.name()));
         if (!isManager && userId != null) {
-            throw new AccessDeniedException(ACCESS_DENIED_EXCEPTION);
+            throw new AccessDeniedException(ExceptionMessages.ACCESS_DENIED_EXCEPTION);
         }
         if (!isManager) {
             searchByIsActive.setUserId(user.getId().toString());

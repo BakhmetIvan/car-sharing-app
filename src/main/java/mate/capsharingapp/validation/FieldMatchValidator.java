@@ -3,6 +3,7 @@ package mate.capsharingapp.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.lang.reflect.Method;
+import mate.capsharingapp.messages.ExceptionMessages;
 
 public class FieldMatchValidator implements ConstraintValidator<FieldMatch, Object> {
     public static final String GET_METHOD_PREFIX = "get";
@@ -29,7 +30,7 @@ public class FieldMatchValidator implements ConstraintValidator<FieldMatch, Obje
             return firstObj == null && secondObj == null
                     || firstObj != null && firstObj.equals(secondObj);
         } catch (Exception e) {
-            throw new RuntimeException("Помилка валідації пароля", e);
+            throw new RuntimeException(ExceptionMessages.PASSWORD_VALIDATION_EXCEPTION, e);
         }
     }
 
