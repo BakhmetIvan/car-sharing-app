@@ -21,7 +21,11 @@ public final class ExceptionMessages {
     public static final String EMAIL_EXIST_EXCEPTION = "Email already registered: %s";
     public static final String NOT_FOUND_USER_EXCEPTION = "Can't find user by id: %d";
     public static final String NOT_FOUND_USER_BY_EMAIL_EXCEPTION = "Can't find user by email: %s";
+    public static final String INVALID_PASSWORD_EXCEPTION = "Invalid password";
+    public static final String AUTHENTICATION_FAILURE_EXCEPTION = "Authentication failed";
+    public static final String USER_DO_NOT_REGISTERED_EXCEPTION = "User not registered";
     public static final String ACCESS_DENIED_EXCEPTION =
             "You are not allowed to view rentals of another user";
     public static final String PASSWORD_VALIDATION_EXCEPTION = "Password validation exception";
+    public static final String INVALID_COMMAND_FORMAT_MSG = "Invalid command format. Use /auth [email] [password]";
 }

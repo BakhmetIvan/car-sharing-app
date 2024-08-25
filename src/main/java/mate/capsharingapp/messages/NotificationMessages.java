@@ -80,4 +80,8 @@ public final class NotificationMessages {
                     Please ensure everything is in order for this rental.
 
                     Thank you.""";
+    public static final String AUTH_SUCCESS_MESSAGE = "You have been successfully authorized as an admin";
+    public static final String AUTH_FAILURE_MESSAGE = "Authorization failed. Check your email and password";
+    public static final String NO_ADMIN_RIGHTS_MESSAGE = "You do not have admin rights";
+    public static final String INVALID_PASSWORD_MESSAGE = "Invalid password";
 }

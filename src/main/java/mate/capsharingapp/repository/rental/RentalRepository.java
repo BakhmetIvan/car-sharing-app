@@ -19,6 +19,8 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
     Optional<Rental> findByIdAndUser(Long id, User user);
 
     @Query("SELECT r FROM Rental r "
+            + "JOIN FETCH r.car c "
+            + "JOIN FETCH r.user u "
             + "WHERE r.actualReturnDate IS NULL "
             + "AND r.returnDate <= :currentDate "
             + "AND r.isDeleted = false")
