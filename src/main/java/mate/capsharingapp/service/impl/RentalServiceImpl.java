@@ -10,6 +10,7 @@ import mate.capsharingapp.exception.EntityNotFoundException;
 import mate.capsharingapp.exception.RentalException;
 import mate.capsharingapp.mapper.RentalMapper;
 import mate.capsharingapp.messages.ExceptionMessages;
+import mate.capsharingapp.messages.NotificationMessages;
 import mate.capsharingapp.model.Car;
 import mate.capsharingapp.model.Payment;
 import mate.capsharingapp.model.Rental;
@@ -28,29 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
-    public static final String RENTAL_CREATE_NOTIFICATION =
-            """
-                    Successful Car Rental
-
-                    Dear Admins,
-
-                    We are pleased to inform you about a successful car rental.\s
-                    Below are the details of the rental and the associated user:
-
-                    Rental Details:
-                    - Rental ID: %s
-                    - Car Model: %s
-                    - Rental Date: %s
-                    - Scheduled Return Date: %s
-
-                    User Details:
-                    - User ID: %s
-                    - User Name: %s %s
-                    - Email: %s
-
-                    Please ensure everything is in order for this rental.
-
-                    Thank you.""";
     private final TelegramNotificationServiceImpl telegramNotificationService;
     private final SpecificationBuilder<Rental> rentalSpecificationBuilder;
     private final PaymentRepository paymentRepository;
@@ -76,7 +54,7 @@ public class RentalServiceImpl implements RentalService {
         rental.setCar(car);
         if (!(user.getTgChatId() == null)) {
             String message = String.format(
-                    RENTAL_CREATE_NOTIFICATION,
+                    NotificationMessages.RENTAL_CREATE_NOTIFICATION,
                     rental.getId(),
                     rental.getCar().getModel(),
                     rental.getRentalDate(),

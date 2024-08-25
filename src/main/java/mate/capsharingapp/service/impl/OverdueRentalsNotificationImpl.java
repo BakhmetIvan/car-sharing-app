@@ -3,6 +3,7 @@ package mate.capsharingapp.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import mate.capsharingapp.messages.NotificationMessages;
 import mate.capsharingapp.model.Rental;
 import mate.capsharingapp.repository.rental.RentalRepository;
 import mate.capsharingapp.service.NotificationService;
@@ -14,35 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class OverdueRentalsNotificationImpl implements OverdueRentalsNotification {
-    public static final String OVERDUE_RENTAL_NOTIFICATION =
-            """
-                    Overdue Rental Alert
-
-                    Dear Admins,
-
-                    We would like to inform you about overdue rentals.
-                    Below are the details of the rentals and the associated users:
-
-                    %s
-
-                    Please take the necessary actions to address these overdue rentals.
-
-                    Thank you.
-                    """;
-
-    public static final String RENTAL_DETAILS_TEMPLATE =
-            """
-                    Rental Details:
-                    - Rental ID: %s
-                    - Car Model: %s
-                    - Rental Date: %s
-                    - Scheduled Return Date: %s
-                    User Details:
-                    - User ID: %s
-                    - User Name: %s %s
-                    - Email: %s
-                    """;
-
     private final NotificationService notificationService;
     private final RentalRepository rentalRepository;
 
@@ -55,7 +27,7 @@ public class OverdueRentalsNotificationImpl implements OverdueRentalsNotificatio
             StringBuilder rentalDetails = new StringBuilder();
             for (Rental rental : overdueRentals) {
                 rentalDetails.append(String.format(
-                        RENTAL_DETAILS_TEMPLATE,
+                        NotificationMessages.RENTAL_DETAILS_TEMPLATE,
                         rental.getId(),
                         rental.getCar().getModel(),
                         rental.getRentalDate(),
@@ -67,7 +39,7 @@ public class OverdueRentalsNotificationImpl implements OverdueRentalsNotificatio
                 )).append("\n");
             }
             notificationService.sendNotificationToAdmins(
-                    String.format(OVERDUE_RENTAL_NOTIFICATION, rentalDetails)
+                    String.format(NotificationMessages.OVERDUE_RENTAL_NOTIFICATION, rentalDetails)
             );
         }
     }

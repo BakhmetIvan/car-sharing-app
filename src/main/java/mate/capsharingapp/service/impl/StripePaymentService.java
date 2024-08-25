@@ -16,6 +16,7 @@ import mate.capsharingapp.exception.EntityNotFoundException;
 import mate.capsharingapp.exception.PaymentException;
 import mate.capsharingapp.mapper.PaymentMapper;
 import mate.capsharingapp.messages.ExceptionMessages;
+import mate.capsharingapp.messages.NotificationMessages;
 import mate.capsharingapp.model.Payment;
 import mate.capsharingapp.model.Rental;
 import mate.capsharingapp.model.User;
@@ -32,34 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class StripePaymentService implements PaymentService {
-    public static final String PAYMENT_SUCCESS_NOTIFICATION =
-            """
-                    Payment Successful
-
-                    Dear Admins,
-
-                    We are pleased to inform you that a payment has been successfully processed.\s
-                    Below are the details of the rental, car, and the associated user:
-
-                    Rental Details:
-                    - Rental ID: %s
-                    - Car Model: %s
-                    - Rental Date: %s
-                    - Scheduled Return Date: %s
-                    - Payment Amount: %s
-
-                    User Details:
-                    - User ID: %s
-                    - User Name: %s %s
-                    - Email: %s
-
-                    Please confirm the payment and update the rental status if necessary.
-
-                    Thank you!""";
-    private static final String PAYMENT_CANCELED_MESSAGE =
-            "Payment session canceled. You can complete the payment within 24 hours";
-    private static final String SUCCESS_COMPLETE_MESSAGE = "Payment successful. Thank you!";
-    private static final String SUCCESS_NOT_COMPLETE_MESSAGE = "Payment not completed";
     private static final String COMPLETE_SESSION_STATUS = "complete";
     private static final String CANCELED_LINK = "https://cancel";
     private static final String SUCCESS_LINK = "https://success";
@@ -127,7 +100,7 @@ public class StripePaymentService implements PaymentService {
                 Rental rental = payment.getRental();
                 notificationService.sendNotificationToAdmins(
                         String.format(
-                                PAYMENT_SUCCESS_NOTIFICATION,
+                                NotificationMessages.PAYMENT_SUCCESS_NOTIFICATION,
                                 rental.getId(),
                                 rental.getCar().getModel(),
                                 rental.getRentalDate(),
@@ -139,9 +112,11 @@ public class StripePaymentService implements PaymentService {
                                 rental.getUser().getEmail())
                 );
                 paymentRepository.save(payment);
-                return paymentMapper.toStatusDto(payment).setMessage(SUCCESS_COMPLETE_MESSAGE);
+                return paymentMapper.toStatusDto(payment)
+                        .setMessage(NotificationMessages.SUCCESS_COMPLETE_MESSAGE);
             }
-            return paymentMapper.toStatusDto(payment).setMessage(SUCCESS_NOT_COMPLETE_MESSAGE);
+            return paymentMapper.toStatusDto(payment)
+                    .setMessage(NotificationMessages.SUCCESS_NOT_COMPLETE_MESSAGE);
         } catch (StripeException e) {
             throw new PaymentException(
                     String.format(ExceptionMessages.PAYMENT_SESSION_EXCEPTION, sessionId));
@@ -155,7 +130,8 @@ public class StripePaymentService implements PaymentService {
                         String.format(ExceptionMessages.PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION,
                                 sessionId))
         );
-        return paymentMapper.toStatusDto(payment).setMessage(PAYMENT_CANCELED_MESSAGE);
+        return paymentMapper.toStatusDto(payment)
+                .setMessage(NotificationMessages.PAYMENT_CANCELED_MESSAGE);
     }
 
     private Optional<Session> createStripeSession(long amountToPay) {
