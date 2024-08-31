@@ -27,5 +27,6 @@ public final class ExceptionMessages {
     public static final String ACCESS_DENIED_EXCEPTION =
             "You are not allowed to view rentals of another user";
     public static final String PASSWORD_VALIDATION_EXCEPTION = "Password validation exception";
-    public static final String INVALID_COMMAND_FORMAT_MSG = "Invalid command format. Use /auth [email] [password]";
+    public static final String INVALID_COMMAND_FORMAT_MSG =
+            "Invalid command format. Use /auth [email] [password]";
 }
