@@ -15,11 +15,14 @@ import mate.capsharingapp.dto.payment.PaymentStatusResponseDto;
 import mate.capsharingapp.exception.EntityNotFoundException;
 import mate.capsharingapp.exception.PaymentException;
 import mate.capsharingapp.mapper.PaymentMapper;
+import mate.capsharingapp.messages.ExceptionMessages;
+import mate.capsharingapp.messages.NotificationMessages;
 import mate.capsharingapp.model.Payment;
 import mate.capsharingapp.model.Rental;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.PaymentRepository;
 import mate.capsharingapp.repository.rental.RentalRepository;
+import mate.capsharingapp.service.NotificationService;
 import mate.capsharingapp.service.PaymentCalculateStrategy;
 import mate.capsharingapp.service.PaymentService;
 import org.springframework.data.domain.Page;
@@ -30,25 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class StripePaymentService implements PaymentService {
-    private static final String RENTAL_NOT_FOUND_EXCEPTION =
-            "Can't find rental by id = %d";
-    private static final String PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION =
-            "Can't find payment by sessionId = %s";
-    private static final String PAYMENT_CREATING_EXCEPTION =
-            "An error occurred while creating the payment";
-    private static final String PAYMENT_SESSION_EXCEPTION =
-            "Stripe error with session: %s";
-    private static final String PAYMENT_CANCELED_MESSAGE =
-            "Payment session canceled. You can complete the payment within 24 hours";
-    private static final String RENTAL_ACCESS_EXCEPTION =
-            "You don't have permission for this rental";
-    private static final String SUCCESS_COMPLETE_MESSAGE = "Payment successful. Thank you!";
-    private static final String SUCCESS_NOT_COMPLETE_MESSAGE = "Payment not completed";
     private static final String COMPLETE_SESSION_STATUS = "complete";
     private static final String CANCELED_LINK = "https://cancel";
     private static final String SUCCESS_LINK = "https://success";
     private static final String SESSION_NAME = "Car Rental Payment";
     private static final int DAY_IN_SECONDS = 86400;
+    private final NotificationService notificationService;
     private final RentalRepository rentalRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
@@ -58,14 +48,15 @@ public class StripePaymentService implements PaymentService {
     public PaymentResponseDto createPaymentSession(PaymentRequestDto paymentRequestDto, User user) {
         if (paymentRepository.findByRentalIdAndStatusIn(paymentRequestDto.getRentalId(),
                 List.of(Payment.PaymentStatus.PAID, Payment.PaymentStatus.PENDING)).isPresent()) {
-            throw new PaymentException(PAYMENT_CREATING_EXCEPTION);
+            throw new PaymentException(ExceptionMessages.PAYMENT_CREATING_EXCEPTION);
         }
         Rental rental = rentalRepository.findById(paymentRequestDto.getRentalId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(RENTAL_NOT_FOUND_EXCEPTION, paymentRequestDto.getRentalId()))
+                        String.format(ExceptionMessages.RENTAL_NOT_FOUND_EXCEPTION,
+                                paymentRequestDto.getRentalId()))
                 );
-        if (!rental.getUser().equals(user)) {
-            throw new PaymentException(RENTAL_ACCESS_EXCEPTION);
+        if (!rental.getUser().getId().equals(user.getId())) {
+            throw new PaymentException(ExceptionMessages.RENTAL_ACCESS_EXCEPTION);
         }
         PaymentCalculateStrategy calculateStrategy = new PaymentCalculateStrategy();
         Payment.PaymentType requestPaymentType =
@@ -73,8 +64,9 @@ public class StripePaymentService implements PaymentService {
         long amountToPay = calculateStrategy
                 .getCalculateServiceByType(requestPaymentType)
                 .calculateAmountToPay(rental).longValue();
-        Session session = createStripeSession(amountToPay)
-                .orElseThrow(() -> new PaymentException(PAYMENT_CREATING_EXCEPTION));
+        Session session = createStripeSession(amountToPay).orElseThrow(
+                () -> new PaymentException(ExceptionMessages.PAYMENT_CREATING_EXCEPTION)
+        );
         Payment payment = new Payment()
                 .setRental(rental)
                 .setAmountToPay(BigDecimal.valueOf(amountToPay))
@@ -99,17 +91,35 @@ public class StripePaymentService implements PaymentService {
         try {
             Payment payment = paymentRepository.findBySessionId(sessionId).orElseThrow(
                     () -> new EntityNotFoundException(
-                            String.format(PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION, sessionId))
+                            String.format(ExceptionMessages.PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION,
+                                    sessionId))
             );
             Session session = Session.retrieve(sessionId);
             if (session.getStatus().equals(COMPLETE_SESSION_STATUS)) {
                 payment.setStatus(Payment.PaymentStatus.PAID);
+                Rental rental = payment.getRental();
+                notificationService.sendNotificationToAdmins(
+                        String.format(
+                                NotificationMessages.PAYMENT_SUCCESS_NOTIFICATION,
+                                rental.getId(),
+                                rental.getCar().getModel(),
+                                rental.getRentalDate(),
+                                rental.getReturnDate(),
+                                payment.getAmountToPay(),
+                                rental.getUser().getId(),
+                                rental.getUser().getLastName(),
+                                rental.getUser().getFirstName(),
+                                rental.getUser().getEmail())
+                );
                 paymentRepository.save(payment);
-                return paymentMapper.toStatusDto(payment).setMessage(SUCCESS_COMPLETE_MESSAGE);
+                return paymentMapper.toStatusDto(payment)
+                        .setMessage(NotificationMessages.SUCCESS_COMPLETE_MESSAGE);
             }
-            return paymentMapper.toStatusDto(payment).setMessage(SUCCESS_NOT_COMPLETE_MESSAGE);
+            return paymentMapper.toStatusDto(payment)
+                    .setMessage(NotificationMessages.SUCCESS_NOT_COMPLETE_MESSAGE);
         } catch (StripeException e) {
-            throw new PaymentException(String.format(PAYMENT_SESSION_EXCEPTION, sessionId));
+            throw new PaymentException(
+                    String.format(ExceptionMessages.PAYMENT_SESSION_EXCEPTION, sessionId));
         }
     }
 
@@ -117,9 +127,11 @@ public class StripePaymentService implements PaymentService {
     public PaymentStatusResponseDto handleCancel(String sessionId) {
         Payment payment = paymentRepository.findBySessionId(sessionId).orElseThrow(
                 () -> new EntityNotFoundException(
-                        String.format(PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION, sessionId))
+                        String.format(ExceptionMessages.PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION,
+                                sessionId))
         );
-        return paymentMapper.toStatusDto(payment).setMessage(PAYMENT_CANCELED_MESSAGE);
+        return paymentMapper.toStatusDto(payment)
+                .setMessage(NotificationMessages.PAYMENT_CANCELED_MESSAGE);
     }
 
     private Optional<Session> createStripeSession(long amountToPay) {
@@ -127,7 +139,7 @@ public class StripePaymentService implements PaymentService {
             SessionCreateParams params = buildSessionCreateParams(amountToPay);
             return Optional.of(Session.create(params));
         } catch (Exception ex) {
-            throw new PaymentException(PAYMENT_CREATING_EXCEPTION);
+            throw new PaymentException(ExceptionMessages.PAYMENT_CREATING_EXCEPTION);
         }
     }
 

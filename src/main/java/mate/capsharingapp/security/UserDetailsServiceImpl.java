@@ -1,6 +1,7 @@
 package mate.capsharingapp.security;
 
 import lombok.RequiredArgsConstructor;
+import mate.capsharingapp.messages.ExceptionMessages;
 import mate.capsharingapp.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +16,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new UsernameNotFoundException("Can't find user by email: " + email)
+                () -> new UsernameNotFoundException(
+                        String.format(ExceptionMessages.NOT_FOUND_USER_BY_EMAIL_EXCEPTION, email)
+                )
         );
     }
 }

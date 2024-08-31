@@ -9,6 +9,7 @@ import mate.capsharingapp.exception.EntityNotFoundException;
 import mate.capsharingapp.exception.ProfileException;
 import mate.capsharingapp.exception.RegistrationException;
 import mate.capsharingapp.mapper.UserMapper;
+import mate.capsharingapp.messages.ExceptionMessages;
 import mate.capsharingapp.model.Role;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.RoleRepository;
@@ -21,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private static final String EMAIL_EXIST_EXCEPTION = "Email already registered: %s";
-    private static final String NOT_FOUND_USER_EXCEPTION = "Can't find user by id: %d";
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -34,7 +33,7 @@ public class UserServiceImpl implements UserService {
             throws RegistrationException {
         if (userRepository.findByEmail(registrationDto.getEmail()).isPresent()) {
             throw new RegistrationException(String.format(
-                    EMAIL_EXIST_EXCEPTION, registrationDto.getEmail())
+                    ExceptionMessages.EMAIL_EXIST_EXCEPTION, registrationDto.getEmail())
             );
         }
         User user = userMapper.toModel(registrationDto);
@@ -53,7 +52,9 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateProfileInfo(User user, UserUpdateDto updateDto) {
         if (updateDto.getEmail().equals(user.getEmail())
                 || userRepository.findByEmail(updateDto.getEmail()).isPresent()) {
-            throw new ProfileException(String.format(EMAIL_EXIST_EXCEPTION, updateDto.getEmail()));
+            throw new ProfileException(
+                    String.format(ExceptionMessages.EMAIL_EXIST_EXCEPTION, updateDto.getEmail())
+            );
         }
         userMapper.userUpdateFromDto(user, updateDto);
         return userMapper.toDto(userRepository.save(user));
@@ -64,7 +65,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateRole(Long id, UserUpdateRoleDto updateRoleDto) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(
-                        String.format(NOT_FOUND_USER_EXCEPTION, id)
+                        String.format(ExceptionMessages.NOT_FOUND_USER_EXCEPTION, id)
                 )
         );
         user.setRoles(roleRepository.findByName(Role.RoleName.valueOf(updateRoleDto.getRole())));

@@ -9,6 +9,8 @@ import mate.capsharingapp.dto.rental.SearchRentalByIsActive;
 import mate.capsharingapp.exception.EntityNotFoundException;
 import mate.capsharingapp.exception.RentalException;
 import mate.capsharingapp.mapper.RentalMapper;
+import mate.capsharingapp.messages.ExceptionMessages;
+import mate.capsharingapp.messages.NotificationMessages;
 import mate.capsharingapp.model.Car;
 import mate.capsharingapp.model.Payment;
 import mate.capsharingapp.model.Rental;
@@ -27,21 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
-    private static final String RENTAL_CREATE_NOTIFICATION =
-            """
-                    🎉 Congratulations, your rental is confirmed! 🚗
-                    Car: %s %s (%s)
-                    Rental start date: %s
-                    Rental end date: %s
-
-                    Thank you for choosing our service! We wish you a pleasant journey. 😊""";
-    private static final String UNPAID_PAYMENT_EXCEPTION =
-            "You cannot create a new rental while you have unpaid rentals";
-    private static final String CAR_NOT_FOUND_EXCEPTION = "Can't find car by id: %d";
-    private static final String RENTAL_NOT_FOUND_EXCEPTION = "Can't find rental by id: %d";
-    private static final String NO_CARS_AVAILABLE_EXCEPTION = "No cars available anymore";
-    private static final String RENTAL_ALREADY_RETURNED_EXCEPTION =
-            "Rental with id - %d already returned";
     private final TelegramNotificationServiceImpl telegramNotificationService;
     private final SpecificationBuilder<Rental> rentalSpecificationBuilder;
     private final PaymentRepository paymentRepository;
@@ -57,23 +44,27 @@ public class RentalServiceImpl implements RentalService {
         rental.setUser(user);
         Car car = carRepository.findById(requestDto.getCarId()).orElseThrow(
                 () -> new EntityNotFoundException(
-                        String.format(CAR_NOT_FOUND_EXCEPTION, requestDto.getCarId()))
+                        String.format(ExceptionMessages.CAR_NOT_FOUND_EXCEPTION,
+                                requestDto.getCarId()))
         );
         if (car.getInventory() < 1) {
-            throw new RentalException(NO_CARS_AVAILABLE_EXCEPTION);
+            throw new RentalException(ExceptionMessages.NO_CARS_AVAILABLE_EXCEPTION);
         }
         car.setInventory(car.getInventory() - 1);
         rental.setCar(car);
         if (!(user.getTgChatId() == null)) {
             String message = String.format(
-                    RENTAL_CREATE_NOTIFICATION,
-                    car.getBrand(),
-                    car.getModel(),
-                    car.getCarType(),
-                    requestDto.getRentalDate(),
-                    requestDto.getReturnDate()
+                    NotificationMessages.RENTAL_CREATE_NOTIFICATION,
+                    rental.getId(),
+                    rental.getCar().getModel(),
+                    rental.getRentalDate(),
+                    rental.getReturnDate(),
+                    user.getId(),
+                    user.getLastName(),
+                    user.getFirstName(),
+                    user.getEmail()
             );
-            telegramNotificationService.sendNotification(user.getTgChatId(), message);
+            telegramNotificationService.sendNotificationToAdmins(message);
         }
         return rentalMapper.toFullDto(rentalRepository.save(rental));
     }
@@ -93,7 +84,7 @@ public class RentalServiceImpl implements RentalService {
     public RentalFullResponseDto findById(User user, Long id) {
         Rental rental = rentalRepository.findByIdAndUser(id, user).orElseThrow(
                 () -> new EntityNotFoundException(
-                        String.format(RENTAL_NOT_FOUND_EXCEPTION, id)
+                        String.format(ExceptionMessages.RENTAL_NOT_FOUND_EXCEPTION, id)
                 )
         );
         return rentalMapper.toFullDto(rental);
@@ -106,18 +97,19 @@ public class RentalServiceImpl implements RentalService {
                                           RentalSetActualReturnDateDto returnDateDto) {
         Rental rental = rentalRepository.findByIdAndUser(id, user).orElseThrow(
                 () -> new EntityNotFoundException(
-                        String.format(RENTAL_NOT_FOUND_EXCEPTION, id)
+                        String.format(ExceptionMessages.RENTAL_NOT_FOUND_EXCEPTION, id)
                 )
         );
         if (rental.getActualReturnDate() != null) {
             throw new RentalException(
-                    String.format(RENTAL_ALREADY_RETURNED_EXCEPTION, rental.getId())
+                    String.format(ExceptionMessages.RENTAL_ALREADY_RETURNED_EXCEPTION,
+                            rental.getId())
             );
         }
         Long carId = rental.getCar().getId();
         Car car = carRepository.findById(carId).orElseThrow(
                 () -> new EntityNotFoundException(
-                        String.format(CAR_NOT_FOUND_EXCEPTION, carId))
+                        String.format(ExceptionMessages.CAR_NOT_FOUND_EXCEPTION, carId))
         );
         car.setInventory(car.getInventory() + 1);
         carRepository.save(car);
@@ -129,7 +121,7 @@ public class RentalServiceImpl implements RentalService {
         boolean hasUnpaidRentals = paymentRepository
                 .existsByRentalUserAndStatus(user, Payment.PaymentStatus.PENDING);
         if (hasUnpaidRentals) {
-            throw new RentalException(UNPAID_PAYMENT_EXCEPTION);
+            throw new RentalException(ExceptionMessages.UNPAID_PAYMENT_EXCEPTION);
         }
     }
 }

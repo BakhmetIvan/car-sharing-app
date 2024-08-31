@@ -5,6 +5,7 @@ import com.stripe.model.checkout.Session;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import mate.capsharingapp.exception.PaymentException;
+import mate.capsharingapp.messages.ExceptionMessages;
 import mate.capsharingapp.model.Payment;
 import mate.capsharingapp.repository.PaymentRepository;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,8 +14,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PaymentExpiredCheckerScheduledServiceImpl {
-    private static final String CHECKING_PAYMENT_EXCEPTION =
-            "Error while checking payment for expiration";
     private static final String EXPIRED_SESSION = "expired";
     private final PaymentRepository paymentRepository;
 
@@ -38,7 +37,7 @@ public class PaymentExpiredCheckerScheduledServiceImpl {
                 paymentRepository.save(payment);
             }
         } catch (StripeException e) {
-            throw new PaymentException(CHECKING_PAYMENT_EXCEPTION);
+            throw new PaymentException(ExceptionMessages.CHECKING_PAYMENT_EXCEPTION);
         }
     }
 }
