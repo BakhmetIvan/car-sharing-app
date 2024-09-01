@@ -34,8 +34,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StripePaymentService implements PaymentService {
     private static final String COMPLETE_SESSION_STATUS = "complete";
-    private static final String CANCELED_LINK = "https://cancel";
-    private static final String SUCCESS_LINK = "https://success";
+    private static final String CANCELED_LINK =
+            "link/payments/success/{CHECKOUT_SESSION_ID}";
+    private static final String SUCCESS_LINK =
+            "link/payments/cancel/{CHECKOUT_SESSION_ID}";
     private static final String SESSION_NAME = "Car Rental Payment";
     private static final int DAY_IN_SECONDS = 86400;
     private final NotificationService notificationService;
