@@ -91,8 +91,8 @@ public class RentalServiceTest {
     private static final RentalFullResponseDto ACTIVE_RENTAL_RESPONSE_DTO =
             new RentalFullResponseDto()
             .setId(ACTIVE_RENTAL.getId())
-            .setCarFullResponseDto(CAR_RESPONSE_DTO)
-            .setUserResponseDto(USER_RESPONSE_DTO)
+            .setCar(CAR_RESPONSE_DTO)
+            .setUser(USER_RESPONSE_DTO)
             .setRentalDate(ACTIVE_RENTAL.getRentalDate())
             .setReturnDate(ACTIVE_RENTAL.getReturnDate());
     private static final RentalResponseDto ACTIVE_RENTAL_SHORT_RESPONSE_DTO =

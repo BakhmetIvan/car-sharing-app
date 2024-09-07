@@ -55,10 +55,7 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PaymentControllerTest {
     protected static MockMvc mockMvc;
-    private static final String PAYMENT_CANCELED_MESSAGE =
-            "Payment session canceled. You can complete the payment within 24 hours";
-    private static final String PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION =
-            "Can't find payment by sessionId = %s";
+    private static final String PAYMENT_CANCELED_MESSAGE = "Payment session canceled";
     private static final Role USER_ROLE = new Role().setName(Role.RoleName.ROLE_USER);
     private static final Car FIRST_CAR = new Car()
             .setId(1L)
@@ -100,7 +97,7 @@ public class PaymentControllerTest {
                     .setAmountToPay(PAYMENT.getAmountToPay());
     private static final PaymentStatusResponseDto PAYMENT_STATUS_RESPONSE_DTO =
             new PaymentStatusResponseDto()
-                    .setStatus(PAYMENT.getStatus())
+                    .setStatus(Payment.PaymentStatus.CANCELED)
                     .setSessionId(PAYMENT.getSessionId())
                     .setMessage(PAYMENT_CANCELED_MESSAGE);
     @Autowired
@@ -178,8 +175,8 @@ public class PaymentControllerTest {
     @DisplayName("Handle cancel payment with invalid session id should throw exception")
     void handleCancel_withInvalidSessionId_ShouldThrowPaymentException() throws Exception {
         mockMvc.perform(
-                get("/payments/cancel/{sessionId}", "someId")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        get("/payments/cancel/{sessionId}", "someId")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 }

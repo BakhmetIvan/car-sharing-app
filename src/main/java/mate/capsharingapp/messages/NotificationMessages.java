@@ -25,8 +25,7 @@ public final class NotificationMessages {
                     Please confirm the payment and update the rental status if necessary.
 
                     Thank you!""";
-    public static final String PAYMENT_CANCELED_MESSAGE =
-            "Payment session canceled. You can complete the payment within 24 hours";
+    public static final String PAYMENT_CANCELED_MESSAGE = "Payment session canceled";
     public static final String SUCCESS_COMPLETE_MESSAGE = "Payment successful. Thank you!";
     public static final String SUCCESS_NOT_COMPLETE_MESSAGE = "Payment not completed";
     public static final String OVERDUE_RENTAL_NOTIFICATION =
