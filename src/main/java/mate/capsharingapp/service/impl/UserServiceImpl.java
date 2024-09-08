@@ -1,5 +1,6 @@
 package mate.capsharingapp.service.impl;
 
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import mate.capsharingapp.dto.user.UserRegistrationDto;
 import mate.capsharingapp.dto.user.UserResponseDto;
@@ -68,7 +69,10 @@ public class UserServiceImpl implements UserService {
                         String.format(ExceptionMessages.NOT_FOUND_USER_EXCEPTION, id)
                 )
         );
-        user.setRoles(roleRepository.findByName(Role.RoleName.valueOf(updateRoleDto.getRole())));
+        Set<Role> roles = roleRepository.findByName(
+                Role.RoleName.valueOf(updateRoleDto.getRole())
+        );
+        user.setRoles(roles);
         return userMapper.toDto(userRepository.save(user));
     }
 }

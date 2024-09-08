@@ -50,7 +50,7 @@ public class CarController {
             description = "Allows an admin to update a car by id")
     public CarFullResponseDto update(@PathVariable @Positive Long id,
                                      @RequestBody @Valid CarRequestDto requestDto) {
-        return carService.save(requestDto);
+        return carService.update(id, requestDto);
     }
 
     @PreAuthorize("hasRole('ROLE_MANAGER')")
