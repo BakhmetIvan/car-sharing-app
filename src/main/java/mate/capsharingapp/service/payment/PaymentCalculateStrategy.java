@@ -1,8 +1,8 @@
-package mate.capsharingapp.service;
+package mate.capsharingapp.service.payment;
 
 import mate.capsharingapp.model.Payment;
-import mate.capsharingapp.service.impl.DefaultPaymentCalculateService;
-import mate.capsharingapp.service.impl.FinePaymentCalculateService;
+import mate.capsharingapp.service.payment.impl.DefaultPaymentCalculateService;
+import mate.capsharingapp.service.payment.impl.FinePaymentCalculateService;
 
 public class PaymentCalculateStrategy {
     public PaymentCalculateService getCalculateServiceByType(Payment.PaymentType paymentType) {

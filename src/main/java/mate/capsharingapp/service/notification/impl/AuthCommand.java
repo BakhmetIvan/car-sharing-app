@@ -1,10 +1,10 @@
-package mate.capsharingapp.service.impl;
+package mate.capsharingapp.service.notification.impl;
 
 import lombok.RequiredArgsConstructor;
 import mate.capsharingapp.messages.ExceptionMessages;
 import mate.capsharingapp.messages.NotificationMessages;
 import mate.capsharingapp.security.AuthenticationService;
-import mate.capsharingapp.service.TelegramCommand;
+import mate.capsharingapp.service.notification.TelegramCommand;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;

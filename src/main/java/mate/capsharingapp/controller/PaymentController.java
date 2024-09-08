@@ -12,7 +12,7 @@ import mate.capsharingapp.dto.payment.PaymentResponseDto;
 import mate.capsharingapp.dto.payment.PaymentStatusResponseDto;
 import mate.capsharingapp.model.Role;
 import mate.capsharingapp.model.User;
-import mate.capsharingapp.service.PaymentService;
+import mate.capsharingapp.service.payment.PaymentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;

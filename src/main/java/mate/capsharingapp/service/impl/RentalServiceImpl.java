@@ -20,6 +20,7 @@ import mate.capsharingapp.repository.PaymentRepository;
 import mate.capsharingapp.repository.SpecificationBuilder;
 import mate.capsharingapp.repository.rental.RentalRepository;
 import mate.capsharingapp.service.RentalService;
+import mate.capsharingapp.service.notification.impl.TelegramNotificationServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

@@ -1,4 +1,4 @@
-package mate.capsharingapp.service;
+package mate.capsharingapp.service.payment;
 
 import mate.capsharingapp.dto.payment.PaymentFullResponseDto;
 import mate.capsharingapp.dto.payment.PaymentRequestDto;

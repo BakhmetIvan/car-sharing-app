@@ -1,4 +1,4 @@
-package mate.capsharingapp.service.impl;
+package mate.capsharingapp.service.notification.impl;
 
 import java.util.List;
 import lombok.Getter;
@@ -9,9 +9,9 @@ import mate.capsharingapp.model.Role;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.UserRepository;
 import mate.capsharingapp.security.AuthenticationService;
-import mate.capsharingapp.service.NotificationService;
-import mate.capsharingapp.service.TelegramCommand;
-import mate.capsharingapp.service.TelegramCommandHandlerStrategy;
+import mate.capsharingapp.service.notification.NotificationService;
+import mate.capsharingapp.service.notification.TelegramCommand;
+import mate.capsharingapp.service.notification.TelegramCommandHandlerStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;

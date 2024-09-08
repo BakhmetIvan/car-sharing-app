@@ -1,9 +1,9 @@
-package mate.capsharingapp.service.impl;
+package mate.capsharingapp.service.payment.impl;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import mate.capsharingapp.model.Rental;
-import mate.capsharingapp.service.PaymentCalculateService;
+import mate.capsharingapp.service.payment.PaymentCalculateService;
 import org.springframework.stereotype.Service;
 
 @Service

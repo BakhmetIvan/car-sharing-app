@@ -1,4 +1,4 @@
-package mate.capsharingapp.service.impl;
+package mate.capsharingapp.service.notification.impl;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import mate.capsharingapp.messages.NotificationMessages;
 import mate.capsharingapp.model.Rental;
 import mate.capsharingapp.repository.rental.RentalRepository;
-import mate.capsharingapp.service.NotificationService;
-import mate.capsharingapp.service.OverdueRentalsNotification;
+import mate.capsharingapp.service.notification.NotificationService;
+import mate.capsharingapp.service.notification.OverdueRentalsNotification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

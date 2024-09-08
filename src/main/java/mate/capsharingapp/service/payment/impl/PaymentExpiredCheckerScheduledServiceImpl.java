@@ -1,4 +1,4 @@
-package mate.capsharingapp.service.impl;
+package mate.capsharingapp.service.payment.impl;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
