@@ -6,8 +6,8 @@ target/
 !**/src/test/**/target/
 
 # Ignore application.properties in src/main/resources
-src/main/resources/application.properties
-.env
+#src/main/resources/application.properties
+#.env
 
 ### STS ###
 .apt_generated
