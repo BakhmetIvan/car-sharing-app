@@ -45,7 +45,8 @@ public class Payment {
     public enum PaymentStatus {
         PENDING("pending"),
         PAID("paid"),
-        EXPIRED("expired");
+        EXPIRED("expired"),
+        CANCELED("canceled");
 
         private final String value;
 

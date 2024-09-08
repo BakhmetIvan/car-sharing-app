@@ -63,7 +63,6 @@ public class PaymentController {
         return paymentService.findAllByUserId(user.getId(), pageable);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_USER')")
     @GetMapping("/success/{sessionId}")
     @Operation(summary = "Handle success payment",
             description = "Returns a message from success payment")
@@ -71,7 +70,6 @@ public class PaymentController {
         return paymentService.handleSuccess(sessionId);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_USER')")
     @GetMapping("/cancel/{sessionId}")
     @Operation(summary = "Handle canceled payment",
             description = "Returns a message from canceled payment")

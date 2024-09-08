@@ -21,6 +21,7 @@ import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.PaymentRepository;
 import mate.capsharingapp.service.impl.StripePaymentService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,8 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ExtendWith(MockitoExtension.class)
 public class PaymentServiceTest {
-    private static final String PAYMENT_CANCELED_MESSAGE =
-            "Payment session canceled. You can complete the payment within 24 hours";
+    private static final String PAYMENT_CANCELED_MESSAGE = "Payment session canceled";
     private static final String PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION =
             "Can't find payment by sessionId = %s";
     private static final Role USER_ROLE = new Role().setName(Role.RoleName.ROLE_USER);
@@ -71,18 +71,18 @@ public class PaymentServiceTest {
             .setSessionUrl("sessionUrl");
     private static final PaymentFullResponseDto PAYMENT_FULL_RESPONSE_DTO =
             new PaymentFullResponseDto()
-            .setId(PAYMENT.getId())
-            .setType(PAYMENT.getType())
-            .setStatus(PAYMENT.getStatus())
-            .setRentalId(PAYMENT.getRental().getId())
-            .setSessionId(PAYMENT.getSessionId())
-            .setSessionUrl(PAYMENT.getSessionUrl())
-            .setAmountToPay(PAYMENT.getAmountToPay());
+                    .setId(PAYMENT.getId())
+                    .setType(PAYMENT.getType())
+                    .setStatus(PAYMENT.getStatus())
+                    .setRentalId(PAYMENT.getRental().getId())
+                    .setSessionId(PAYMENT.getSessionId())
+                    .setSessionUrl(PAYMENT.getSessionUrl())
+                    .setAmountToPay(PAYMENT.getAmountToPay());
     private static final PaymentStatusResponseDto PAYMENT_STATUS_RESPONSE_DTO =
             new PaymentStatusResponseDto()
-            .setStatus(PAYMENT.getStatus())
-            .setSessionId(PAYMENT.getSessionId())
-            .setMessage(PAYMENT_CANCELED_MESSAGE);
+                    .setStatus(PAYMENT.getStatus())
+                    .setSessionId(PAYMENT.getSessionId())
+                    .setMessage(PAYMENT_CANCELED_MESSAGE);
     @Mock
     private PaymentMapper paymentMapper;
     @Mock
@@ -91,6 +91,7 @@ public class PaymentServiceTest {
     private StripePaymentService paymentService;
 
     @Test
+    @DisplayName("Find all payments by valid user should return a page of payments")
     void findAllByUserId_withValidUser_ShouldReturnPayments() {
         Pageable pageable = PageRequest.of(0, 10);
         when(paymentRepository.findAllByRentalUserId(RENTAL.getUser().getId(), pageable))
@@ -108,21 +109,25 @@ public class PaymentServiceTest {
     }
 
     @Test
+    @DisplayName("Handle cancel payment with valid data should return a message")
     void handleCancel_withValidData_ShouldReturnCanceledMessage() {
         String sessionId = "someSessionId";
 
-        when(paymentRepository.findBySessionId(sessionId))
-                .thenReturn(Optional.of(PAYMENT));
+        when(paymentRepository.findBySessionId(sessionId)).thenReturn(Optional.of(PAYMENT));
+        when(paymentRepository.save(PAYMENT))
+                .thenReturn(PAYMENT.setStatus(Payment.PaymentStatus.CANCELED));
         when(paymentMapper.toStatusDto(PAYMENT)).thenReturn(PAYMENT_STATUS_RESPONSE_DTO);
         PaymentStatusResponseDto actual = paymentService.handleCancel(sessionId);
 
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(PAYMENT_STATUS_RESPONSE_DTO, actual);
         verify(paymentRepository, times(1)).findBySessionId(sessionId);
+        verify(paymentRepository, times(1)).save(PAYMENT);
         verify(paymentMapper, times(1)).toStatusDto(PAYMENT);
     }
 
     @Test
+    @DisplayName("Handle cancel payment with invalid data should throw EntityNotFoundException")
     void handleCancel_withInvalidSessionId_ShouldThrowException() {
         String sessionId = "someSessionId";
 

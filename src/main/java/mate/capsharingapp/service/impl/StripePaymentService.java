@@ -34,8 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StripePaymentService implements PaymentService {
     private static final String COMPLETE_SESSION_STATUS = "complete";
-    private static final String CANCELED_LINK = "https://cancel";
-    private static final String SUCCESS_LINK = "https://success";
+    private static final String DOMAIN = "http://ec2-3-84-23-2.compute-1.amazonaws.com";
+    private static final String CANCELED_LINK = "/payments/success/{CHECKOUT_SESSION_ID}";
+    private static final String SUCCESS_LINK = "/payments/cancel/{CHECKOUT_SESSION_ID}";
     private static final String SESSION_NAME = "Car Rental Payment";
     private static final int DAY_IN_SECONDS = 86400;
     private final NotificationService notificationService;
@@ -123,6 +124,7 @@ public class StripePaymentService implements PaymentService {
         }
     }
 
+    @Transactional
     @Override
     public PaymentStatusResponseDto handleCancel(String sessionId) {
         Payment payment = paymentRepository.findBySessionId(sessionId).orElseThrow(
@@ -130,7 +132,8 @@ public class StripePaymentService implements PaymentService {
                         String.format(ExceptionMessages.PAYMENT_NOT_FOUND_BY_SESSION_EXCEPTION,
                                 sessionId))
         );
-        return paymentMapper.toStatusDto(payment)
+        payment.setStatus(Payment.PaymentStatus.CANCELED);
+        return paymentMapper.toStatusDto(paymentRepository.save(payment))
                 .setMessage(NotificationMessages.PAYMENT_CANCELED_MESSAGE);
     }
 
@@ -148,8 +151,8 @@ public class StripePaymentService implements PaymentService {
                 .setExpiresAt(Instant.now().getEpochSecond() + DAY_IN_SECONDS)
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl(SUCCESS_LINK)
-                .setCancelUrl(CANCELED_LINK)
+                .setSuccessUrl(DOMAIN + SUCCESS_LINK)
+                .setCancelUrl(DOMAIN + CANCELED_LINK)
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()
                                 .setQuantity(1L)

@@ -13,6 +13,6 @@ public class RentalFullResponseDto {
     private LocalDate rentalDate;
     private LocalDate returnDate;
     private LocalDate actualReturnDate;
-    private CarFullResponseDto carFullResponseDto;
-    private UserResponseDto userResponseDto;
+    private CarFullResponseDto car;
+    private UserResponseDto user;
 }

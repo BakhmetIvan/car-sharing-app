@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import mate.capsharingapp.exception.TelegramException;
 import mate.capsharingapp.model.Role;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.UserRepository;
@@ -36,8 +37,13 @@ public class TelegramNotificationServiceImpl extends TelegramLongPollingBot
     public void onUpdateReceived(Update update) {
         String messageText = update.getMessage().getText();
         Long chatId = update.getMessage().getChatId();
-        TelegramCommand handledCommand = telegramCommandHandler.handleCommand(messageText);
-        String response = handledCommand.execute(messageText, chatId);
+        String response;
+        try {
+            TelegramCommand handledCommand = telegramCommandHandler.handleCommand(messageText);
+            response = handledCommand.execute(messageText, chatId);
+        } catch (TelegramException e) {
+            response = e.getMessage();
+        }
         sendNotification(chatId, response);
     }
 
