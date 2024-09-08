@@ -19,7 +19,7 @@ import mate.capsharingapp.model.Rental;
 import mate.capsharingapp.model.Role;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.PaymentRepository;
-import mate.capsharingapp.service.impl.StripePaymentService;
+import mate.capsharingapp.service.payment.impl.StripePaymentService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

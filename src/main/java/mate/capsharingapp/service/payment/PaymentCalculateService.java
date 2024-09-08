@@ -1,4 +1,4 @@
-package mate.capsharingapp.service;
+package mate.capsharingapp.service.payment;
 
 import java.math.BigDecimal;
 import mate.capsharingapp.model.Rental;

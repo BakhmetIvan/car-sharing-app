@@ -1,4 +1,4 @@
-package mate.capsharingapp.service.impl;
+package mate.capsharingapp.service.payment.impl;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -22,9 +22,9 @@ import mate.capsharingapp.model.Rental;
 import mate.capsharingapp.model.User;
 import mate.capsharingapp.repository.PaymentRepository;
 import mate.capsharingapp.repository.rental.RentalRepository;
-import mate.capsharingapp.service.NotificationService;
-import mate.capsharingapp.service.PaymentCalculateStrategy;
-import mate.capsharingapp.service.PaymentService;
+import mate.capsharingapp.service.notification.NotificationService;
+import mate.capsharingapp.service.payment.PaymentCalculateStrategy;
+import mate.capsharingapp.service.payment.PaymentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

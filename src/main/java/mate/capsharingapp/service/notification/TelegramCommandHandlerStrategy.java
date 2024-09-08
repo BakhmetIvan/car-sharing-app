@@ -1,9 +1,9 @@
-package mate.capsharingapp.service;
+package mate.capsharingapp.service.notification;
 
 import lombok.RequiredArgsConstructor;
 import mate.capsharingapp.exception.TelegramException;
 import mate.capsharingapp.messages.ExceptionMessages;
-import mate.capsharingapp.service.impl.AuthCommand;
+import mate.capsharingapp.service.notification.impl.AuthCommand;
 import org.springframework.stereotype.Service;
 
 @Service
